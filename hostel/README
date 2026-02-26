@@ -1,0 +1,51 @@
+The Owner table
+ owner id
+ name
+ mobile
+ email
+ password
+ created_at
+
+
+
+ ✅ Owner Responsibilities (Business View)
+ Register
+ Login
+ Create hostel
+ Update hostel details
+ View dashboard stats
+ Add tenants
+ Vacate tenants
+ View collections
+
+
+CREATE TABLE owner (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    mobile VARCHAR(15) NOT NULL UNIQUE,
+    email VARCHAR(150) UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+
+
+CREATE TABLE hostel (
+    id BIGSERIAL PRIMARY KEY,
+    owner_id BIGINT NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    total_beds INT NOT NULL,
+    monthly_fee NUMERIC(10,2),
+    maintenance_fee NUMERIC(10,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ CREATE TABLE bed (
+     id BIGSERIAL PRIMARY KEY,
+     hostel_id BIGINT NOT NULL,
+     bed_number VARCHAR(20) NOT NULL,
+     status VARCHAR(20) NOT NULL
+ );
