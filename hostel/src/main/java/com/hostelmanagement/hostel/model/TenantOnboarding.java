@@ -1,4 +1,4 @@
-package com.hostelmanagement.hostel.dto;
+package com.hostelmanagement.hostel.model;
 
 
 import jakarta.persistence.Entity;
@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +29,8 @@ public class TenantOnboarding {
     private Double agreedMaintenanceFee;
 
     private String token;
+
+    private LocalDateTime createdAt;
 
     private boolean completed;
 }
