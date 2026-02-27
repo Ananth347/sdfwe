@@ -18,11 +18,14 @@ public class TenantService {
 
     @Transactional
     public Tenant createTenant(TenantCreateDto dto) {
-        Tenant existingTenant = tenantRepository.findByMobile(dto.getMobile());
-        existingTenant.setEmail(dto.getEmail());
-        existingTenant.setStatus(dto.getStatus());
-        existingTenant.setProfileCompleted(dto.getProfileCompleted());
 
-        return tenantRepository.save(existingTenant);
+        Tenant tenant = new Tenant();
+        tenant.setName(dto.getName());
+        tenant.setMobile(dto.getMobile());
+        tenant.setEmail(dto.getEmail());
+        tenant.setStatus(dto.getStatus());
+        tenant.setProfileCompleted(dto.getProfileCompleted());
+
+        return tenantRepository.save(tenant);
     }
 }
