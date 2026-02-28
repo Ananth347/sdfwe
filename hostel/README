@@ -49,3 +49,446 @@ CREATE TABLE hostel (
      bed_number VARCHAR(20) NOT NULL,
      status VARCHAR(20) NOT NULL
  );
+
+ Good thinking. This is exactly how a **system architect** approaches a product:
+ define **actors → modules → actions → flows** before coding.
+
+ Below is a **clean product scope** for your hostel management SaaS so you **don’t go out of track**.
+
+ ---
+
+ # 1️⃣ OWNER MODULE (Hostel Owner Actions)
+
+ ### Account & Profile
+
+ Owner can:
+
+ * Register account
+ * Login
+ * Update profile
+ * Change password
+ * Logout
+
+ ---
+
+ ### Hostel Management
+
+ Owner can:
+
+ * Create hostel
+ * Update hostel details
+ * Delete hostel
+ * View hostel dashboard
+
+ Hostel details:
+ * hostel name
+ * address
+ * number of beds
+ * default fee (optional)
+
+ ---
+
+ ### Bed Management
+
+ Owner can:
+
+ * View all beds
+ * Increase bed count
+ * Decrease bed count (only if beds are AVAILABLE)
+ * Rename beds
+ * Set default bed price
+ * Set maintenance fee
+
+ Bed states:
+
+ ```
+ AVAILABLE
+ RESERVED
+ OCCUPIED
+ MAINTENANCE
+ ```
+
+ ---
+
+ ### Tenant Onboarding
+
+ Owner can:
+
+ * Select bed
+ * Enter tenant basic details:
+
+   * name
+   * mobile
+   * negotiated monthly fee
+   * maintenance fee
+   * advance amount
+
+ System will:
+
+ ```
+ Generate onboarding token
+ ↓
+ Send WhatsApp link
+ ```
+
+ Owner can also:
+
+ * Resend onboarding link
+ * Cancel onboarding request
+
+ ---
+
+ ### Tenant Management
+
+ Owner can:
+
+ * View all tenants
+ * View tenant profile
+ * Edit tenant details
+ * See tenant payment history
+ * See tenant due amount
+ * Vacate tenant
+
+ When tenant vacates:
+
+ ```
+ BedAllocation END
+ ↓
+ Advance refund calculation
+ ↓
+ Bed becomes AVAILABLE
+ ```
+
+ ---
+
+ ### Payments & Billing
+
+ Owner can:
+
+ * View monthly collection
+ * View pending payments
+ * View payment history
+ * View advance balances
+ * Download receipts
+ * Record offline payments (optional)
+
+ ---
+
+ ### Monthly Billing
+
+ Every month system will:
+
+ ```
+ Generate new monthly bill
+ ↓
+ Send reminder
+ ```
+
+ Owner can:
+
+ * mark payment received
+ * add late fee
+ * extend due date
+
+ ---
+
+ ### Notifications
+
+ Owner receives:
+
+ * payment success alerts
+ * tenant registration alerts
+ * vacancy alerts
+ * due alerts
+
+ ---
+
+ ### Dashboard
+
+ Owner dashboard shows:
+
+ * total beds
+ * occupied beds
+ * available beds
+ * tenants
+ * monthly revenue
+ * pending payments
+ * advance balances
+
+ ---
+
+ # 2️⃣ TENANT MODULE
+
+ ### Onboarding
+
+ Tenant receives WhatsApp link.
+
+ Tenant can:
+
+ * open onboarding link
+ * see prefilled details
+ * fill profile details
+ * upload ID proof (optional)
+ * pay advance + monthly fee
+
+ After payment:
+
+ ```
+ Tenant status → ACTIVE
+ Bed → OCCUPIED
+ ```
+
+ ---
+
+ ### Tenant Profile
+
+ Tenant can:
+
+ * update profile
+ * update email
+ * upload documents
+ * update emergency contact
+
+ ---
+
+ ### Payments
+
+ Tenant can:
+
+ * pay monthly fee
+ * pay advance
+ * see payment history
+ * download receipts
+
+ Payment methods:
+
+ ```
+ UPI
+ PhonePe
+ Google Pay
+ Card
+ ```
+
+ ---
+
+ ### Notifications
+
+ Tenant receives:
+
+ * payment reminders
+ * payment success confirmation
+ * upcoming due reminder
+ * hostel announcements
+
+ ---
+
+ ### Tenant Dashboard
+
+ Tenant can see:
+
+ * bed details
+ * rent amount
+ * due amount
+ * payment history
+ * advance balance
+
+ ---
+
+ # 3️⃣ BED MODULE
+
+ Bed contains:
+
+ * bedId
+ * hostelId
+ * bedName
+ * bedNumber
+ * status
+
+ Statuses:
+
+ ```
+ AVAILABLE
+ RESERVED
+ OCCUPIED
+ MAINTENANCE
+ ```
+
+ Actions:
+
+ Owner can:
+
+ * rename bed
+ * change bed price
+ * mark bed under maintenance
+ * release bed
+
+ ---
+
+ # 4️⃣ BED ALLOCATION MODULE
+
+ Represents **tenant stay record**.
+
+ Fields:
+
+ ```
+ tenantId
+ bedId
+ agreedMonthlyFee
+ maintenanceFee
+ advancePaid
+ startDate
+ endDate
+ status
+ ```
+
+ Statuses:
+
+ ```
+ PENDING
+ ACTIVE
+ ENDED
+ ```
+
+ Actions:
+
+ * allocate bed
+ * end allocation
+ * transfer tenant to another bed
+
+ ---
+
+ # 5️⃣ PAYMENT MODULE
+
+ Types:
+
+ ```
+ ADVANCE_PAYMENT
+ MONTHLY_RENT
+ MAINTENANCE_FEE
+ LATE_FEE
+ REFUND
+ ```
+
+ Actions:
+
+ * create payment
+ * record payment
+ * payment webhook handling
+ * refund advance
+
+ ---
+
+ # 6️⃣ BILLING MODULE
+
+ Monthly billing process:
+
+ ```
+ 1st of month
+ ↓
+ Generate monthly invoice
+ ↓
+ Send WhatsApp reminder
+ ↓
+ Due date = 5th
+ ↓
+ Late fee after due date
+ ```
+
+ ---
+
+ # 7️⃣ REMINDER SYSTEM
+
+ Automatic reminders:
+
+ * 3 days before due
+ * due day
+ * overdue reminder
+
+ Channels:
+
+ ```
+ WhatsApp
+ SMS
+ Email
+ ```
+
+ ---
+
+ # 8️⃣ VACATE TENANT FLOW
+
+ Owner selects **vacate tenant**
+
+ System will:
+
+ ```
+ calculate pending dues
+ ↓
+ calculate advance refund
+ ↓
+ close BedAllocation
+ ↓
+ Bed status → AVAILABLE
+ ↓
+ tenant status → VACATED
+ ```
+
+ ---
+
+ # 9️⃣ REPORTS MODULE
+
+ Owner can see:
+
+ * monthly revenue report
+ * payment collection report
+ * pending dues report
+ * occupancy report
+
+ ---
+
+ # 🔟 ADMIN MODULE (Later)
+
+ Admin can:
+
+ * manage owners
+ * suspend accounts
+ * view system metrics
+ * manage subscriptions
+
+ ---
+
+ # System Architecture (Simple)
+
+ ```
+ Owner
+  ↓
+ Hostel
+  ↓
+ Bed
+  ↓
+ BedAllocation
+  ↓
+ Tenant
+  ↓
+ Payments
+ ```
+
+ ---
+
+ # Advice as Architect
+
+ Build modules in this order:
+
+ 1️⃣ Owner authentication
+ 2️⃣ Hostel module
+ 3️⃣ Bed module
+ 4️⃣ Tenant onboarding
+ 5️⃣ Bed allocation
+ 6️⃣ Payment module
+ 7️⃣ Monthly billing
+ 8️⃣ Reminder system
+ 9️⃣ Vacate tenant flow
+ 🔟 Reports
+
+ ---
+
+ If you want, I can also give you the **complete database schema (15 tables)** for this system. That will make sure you **never need a DB redesign later**.
